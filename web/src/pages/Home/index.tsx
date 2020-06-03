@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FiLogIn } from 'react-icons/fi';
 
 // import { Container } from './styles';
@@ -22,7 +23,7 @@ const Home: React.FC = () => {
             Ajudamos pessoas a encontrarem pontos de coleta de forma eficiente.
           </p>
 
-          <a href="/cadastro">
+          <Link to="/create-point">
             <span>
               <FiLogIn />
             </span>
@@ -30,7 +31,7 @@ const Home: React.FC = () => {
             <strong>
               Cadastre um ponto de coleta
             </strong>
-          </a>
+          </Link>
         </main>
       </div>
     </div>
