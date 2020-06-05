@@ -9,7 +9,7 @@ export default class PointsController {
     const trx = await knex.transaction();
 
     const point = {
-      image: 'https://picsum.photos/400/400',
+      image: request.file.filename,
       name, email, whatsapp, latitude, longitude, city, uf,
     };
   
@@ -17,11 +17,14 @@ export default class PointsController {
   
     const point_id = insertedIds[0];
   
-    const pointItems = items.map( (item_id: number) => {
-      return {
-        item_id,
-        point_id,
-      }
+    const pointItems = items
+      .split(',')
+      .map( (item:string) => Number(item.trim()))
+      .map( (item_id: number) => {
+        return {
+          item_id,
+          point_id,
+        }
     })
   
     await trx('point_items').insert(pointItems);
@@ -44,12 +47,17 @@ export default class PointsController {
       return response.status(400).json({ message: 'Point not found.'});
     }
 
+    const serializedPoint = {
+        ...point,
+        image_url: `http://10.0.0.165:3333/uploads/${point.image}`,
+    };
+
     const items = await knex('items')
       .join('point_items', 'items.id', '=', 'point_items.item_id')
       .where('point_items.point_id', id)
       .select('items.title');
 
-    return response.json({point, items});
+    return response.json({point: serializedPoint, items});
 
   }
 
@@ -69,7 +77,13 @@ export default class PointsController {
       .distinct()
       .select('points.*');
 
-  
-    response.json(points);
+    const serializedPoints = points.map(point => {
+      return {
+        ...point,
+        image_url: `http://10.0.0.165:3333/uploads/${point.image}`,
+      }
+    });
+
+    response.json(serializedPoints);
   }
 }
